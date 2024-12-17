@@ -39,8 +39,6 @@ app.setErrorHandler((error, request, reply) => {
     }
 });
 
-
-
 // Schemas
 await registerSchemas(app);
 

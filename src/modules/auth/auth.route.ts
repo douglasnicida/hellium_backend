@@ -1,29 +1,24 @@
-import { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { LoginPostSchema, RegisterPostSchema } from "./auth.schema";
 import { AuthService } from "./auth.service";
 import { prisma } from "../../database/prisma-client";
-import { CustomReply, HttpCodes } from "../../types/fastify.type";
-import { User } from "@prisma/client";
+import { HttpCodes } from "../../types/fastify.type";
+import { LoginDTO } from "./dto/loginDTO";
+import { RegisterDTO } from "./dto/registerDTO";
 
 export interface LoginRequestBody {
-    Body: {
-        email: string;
-        password: string;
-    }
+    Body: LoginDTO
 }
 
 export interface RegisterRequestBody {
-    Body: {
-        name: string;
-    } & LoginRequestBody['Body'];
+    Body: RegisterDTO
 }
 
-// TODO: testar rotas de autenticação
 const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
     const authService = new AuthService(prisma);
 
-    fastifyApp.post('/register', RegisterPostSchema, async (req: FastifyRequest<RegisterRequestBody>, res: FastifyReply) => {
-        
+    fastifyApp.post('/register', RegisterPostSchema, 
+    async (req: FastifyRequest<RegisterRequestBody>, res: FastifyReply) => {
         try {
             const resContent = await authService.register(req.body);
 
@@ -35,7 +30,6 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
 
     fastifyApp.post('/login', LoginPostSchema,
     async (req: FastifyRequest<LoginRequestBody>, res: FastifyReply) => {
-
         try {
             const resContent = await authService.login(req.body, fastifyApp);
         

@@ -7,6 +7,7 @@ export const HttpCodes = {
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
+    CONFLICT: 409,
     INTERNAL_SERVER_ERROR: 500,
 } as const;
 export type HttpCodes = typeof HttpCodes[keyof typeof HttpCodes];

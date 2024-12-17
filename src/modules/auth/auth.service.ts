@@ -5,11 +5,12 @@ import bcrypt from 'bcrypt';
 import { FastifyInstance } from "fastify";
 import { ConflictError, UnauthorizedError } from "../../handlers/errorHandler";
 import { CustomReply } from "../../types/fastify.type";
+import { RegisterDTO } from "./dto/registerDTO";
+import { LoginDTO } from "./dto/loginDTO";
 
 export class AuthService {
     constructor(private prisma: PrismaClient) {}
 
-    
     private async generateToken(userID: string, username: string, fastifyApp: FastifyInstance) {
         const tokenPayload = {id: userID, name: username}
         
@@ -27,16 +28,16 @@ export class AuthService {
         }
     }
 
-    async register(data: RegisterRequestBody['Body']) {
-        const user = await this.prisma.user.findFirst({where: {email: data.email}});
+    async register(registerDTO: RegisterDTO) {
+        const user = await this.prisma.user.findFirst({where: {email: registerDTO.email}});
 
         if(user) {
             throw ConflictError('This e-mail is already registered.');
         }
 
         const newUserData = {
-            ...data,
-            password: await bcrypt.hash(data.password, Number(process.env.SALT_ROUNDS))
+            ...registerDTO,
+            password: await bcrypt.hash(registerDTO.password, Number(process.env.SALT_ROUNDS))
         }
 
         const newUser = await this.prisma.user.create({ data: newUserData });
@@ -49,14 +50,14 @@ export class AuthService {
         return resContent;
     }
 
-    async login(credentials: LoginRequestBody['Body'], fastifyApp: FastifyInstance) {
+    async login(credentialsDTO: LoginDTO, fastifyApp: FastifyInstance) {
         const user = await this.prisma.user.findFirstOrThrow({
             where: {
-                email: credentials.email,
+                email: credentialsDTO.email,
             }
         })
 
-        const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+        const isValidPassword = await bcrypt.compare(credentialsDTO.password, user.password);
 
         if(user && isValidPassword){
             const resContent: CustomReply<any> = {

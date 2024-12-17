@@ -1,3 +1,5 @@
+import { HttpCodes } from "../types/fastify.type";
+
 // Classe para erro customizado com statusCode
 export class HttpError extends Error {
     statusCode: number;
@@ -15,19 +17,19 @@ function createHttpError(message: string, statusCode: number) {
 }
 
 export const ConflictError = (message = 'Conflict error.') =>
-    createHttpError(message, 409);
+    createHttpError(message, HttpCodes.CONFLICT);
 
 export const BadRequestError = (message = 'Bad request.') =>
-    createHttpError(message, 400);
+    createHttpError(message, HttpCodes.BAD_REQUEST);
 
 export const UnauthorizedError = (message = 'Unauthorized access.') =>
-    createHttpError(message, 401);
+    createHttpError(message, HttpCodes.UNAUTHORIZED);
 
 export const ForbiddenError = (message = 'Forbidden access.') =>
-    createHttpError(message, 403);
+    createHttpError(message, HttpCodes.FORBIDDEN);
 
 export const NotFoundError = (message = 'Resource not found.') =>
-    createHttpError(message, 404);
+    createHttpError(message, HttpCodes.NOT_FOUND);
 
 export const InternalServerError = (message = 'Internal Server Error.') =>
-    createHttpError(message, 500);
+    createHttpError(message, HttpCodes.INTERNAL_SERVER_ERROR);
