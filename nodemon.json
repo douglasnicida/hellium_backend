@@ -1,0 +1,6 @@
+{
+  "exec": "tsx",
+  "ext": "ts",
+  "watch": ["src"]
+}
+  

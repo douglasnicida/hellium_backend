@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String  @unique
+  password String
+  active   Boolean @default(true)
+}
+
+model Customer {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  companyName String?
+  personName  String?
+  active      Boolean @default(true)
+
+  sales Sale[]
+}
+
+model Product {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  price         Float
+  stockQuantity Int
+  active        Boolean @default(true)
+
+  items  Item[]
+  recipe Recipe?
+}
+
+model Ingredient {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  quantity    Float
+  unit        String
+  description String?
+  active      Boolean @default(true)
+
+  recipes    Recipe[] @relation(fields: [recipesIDs], references: [id])
+  recipesIDs String[] @db.ObjectId
+}
+
+model Recipe {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  description String
+
+  ingredients    Ingredient[] @relation(fields: [ingredientsIDs], references: [id])
+  ingredientsIDs String[]     @db.ObjectId
+
+  product   Product @relation(fields: [productID], references: [id])
+  productID String  @unique @db.ObjectId
+}
+
+model Item {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  quantity Int
+  price    Float
+
+  product   Product @relation(fields: [productID], references: [id])
+  productID String  @db.ObjectId
+
+  Sale   Sale   @relation(fields: [saleID], references: [id])
+  saleID String @db.ObjectId
+}
+
+model Sale {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  amount Float
+  status String
+
+  items Item[]
+
+  customer   Customer @relation(fields: [customerID], references: [id])
+  customerID String   @db.ObjectId
+}

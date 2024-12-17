@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "fastify"]
+  },
+  "include": ["src/**/*", "prisma/PrismaService.ts"],
+  "exclude": ["node_modules"]
+}
