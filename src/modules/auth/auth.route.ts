@@ -25,12 +25,7 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
     fastifyApp.post('/register', RegisterPostSchema, async (req: FastifyRequest<RegisterRequestBody>, res: FastifyReply) => {
         
         try {
-            const newUser = await authService.register(req.body);
-
-            const resContent: CustomReply<User> = {
-                message: 'User created successfully',
-                payload: newUser,
-            }
+            const resContent = await authService.register(req.body);
 
             return res.status(HttpCodes.CREATED).customSend(resContent);
         } catch (err) {
@@ -41,16 +36,13 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
     fastifyApp.post('/login', LoginPostSchema,
     async (req: FastifyRequest<LoginRequestBody>, res: FastifyReply) => {
 
-        const token = await authService.login(req.body, fastifyApp);
-
-        const resContent: CustomReply<any> = {
-            message: 'User logged in successfully.',
-            payload: {
-                access_token: token
-            }
+        try {
+            const resContent = await authService.login(req.body, fastifyApp);
+        
+            return res.status(HttpCodes.OK).customSend(resContent)
+        } catch (err) {
+            return res.status(err.statusCode).customSend({message: err.message});
         }
-
-        return res.status(HttpCodes.OK).customSend(resContent)
     })
 
     done();

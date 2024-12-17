@@ -1,9 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import jwt from 'jsonwebtoken'
 import { LoginRequestBody, RegisterRequestBody } from "./auth.route";
 import bcrypt from 'bcrypt';
 import { FastifyInstance } from "fastify";
-import { ConflictError } from "../../handlers/errorHandler";
+import { ConflictError, UnauthorizedError } from "../../handlers/errorHandler";
+import { CustomReply } from "../../types/fastify.type";
 
 export class AuthService {
     constructor(private prisma: PrismaClient) {}
@@ -40,7 +41,12 @@ export class AuthService {
 
         const newUser = await this.prisma.user.create({ data: newUserData });
 
-        return newUser;
+        const resContent: CustomReply<User> = {
+            message: 'User created successfully',
+            payload: newUser,
+        }
+
+        return resContent;
     }
 
     async login(credentials: LoginRequestBody['Body'], fastifyApp: FastifyInstance) {
@@ -53,9 +59,16 @@ export class AuthService {
         const isValidPassword = await bcrypt.compare(credentials.password, user.password);
 
         if(user && isValidPassword){
-            return this.generateToken(user.id, user.name, fastifyApp);
+            const resContent: CustomReply<any> = {
+                message: 'User logged in successfully.',
+                payload: {
+                    access_token: await this.generateToken(user.id, user.name, fastifyApp)
+                }
+            } 
+            
+            return resContent;
         }
 
-        throw new Error('Invalid credentials');
+        throw UnauthorizedError('Invalid credentials');
     }
 }
