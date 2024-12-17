@@ -1,20 +1,13 @@
-import { ProductSchema } from "../product/product.schema";
-import { SaleSchema } from "../sale/sale.schema";
-
 export const ItemSchema = {
+    $id: 'ItemSchema',
     type: 'object',
     properties: {
-        id: { type: 'string' },
-        quantity: { type: 'integer' },
-        price: { type: 'number' },
-        product: { 
-            type: 'object', 
-            ...ProductSchema
-        },
-        Sale: { 
-            type: 'object', 
-            ...SaleSchema
-        }
+      id: { type: 'string' },
+      quantity: { type: 'integer' },
+      price: { type: 'number' },
+      productID: { type: 'string' },
+      saleID: { type: 'string' }
     },
-    required: ['id', 'quantity', 'price']
-};
+    required: ['id', 'quantity', 'price', 'productID', 'saleID']
+  };
+  

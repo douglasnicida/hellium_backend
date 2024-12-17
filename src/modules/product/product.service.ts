@@ -1,5 +1,7 @@
 import { PrismaClient, Product } from "@prisma/client";
 import { CustomReply } from "../../types/fastify.type";
+import { NotFoundError } from "../../handlers/errorHandler";
+import { ObjectId } from "mongodb";
 
 export class ProductService {
     constructor(private prisma: PrismaClient) {}
@@ -13,7 +15,18 @@ export class ProductService {
         return resContent;
     }
 
-    async findByID(id: string) {
-        const product = await this.prisma.product.findUnique({ where: { id: id } });
+    async findByID(id: ObjectId) {
+
+        const product = await this.prisma.product.findFirst({ where: { id: id.toString() } });
+
+        if(!product) {
+            throw NotFoundError('No product found.');
+        }
+
+        const resContent: CustomReply<Product> = {
+            payload: product,
+        }
+
+        return resContent;
     }
 }

@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { LoginPostSchema, RegisterPostSchema } from "./auth.schema";
 import { AuthService } from "./auth.service";
 import { prisma } from "../../database/prisma-client";
@@ -24,14 +24,18 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
 
     fastifyApp.post('/register', RegisterPostSchema, async (req: FastifyRequest<RegisterRequestBody>, res: FastifyReply) => {
         
-        const newUser = await authService.register(req.body);
+        try {
+            const newUser = await authService.register(req.body);
 
-        const resContent: CustomReply<User> = {
-            message: 'User created successfully',
-            payload: newUser,
+            const resContent: CustomReply<User> = {
+                message: 'User created successfully',
+                payload: newUser,
+            }
+
+            return res.status(HttpCodes.CREATED).customSend(resContent);
+        } catch (err) {
+            return res.status(err.statusCode).customSend({message: err.message});
         }
-
-        return res.status(HttpCodes.CREATED).customSend(resContent);
     })
 
     fastifyApp.post('/login', LoginPostSchema,

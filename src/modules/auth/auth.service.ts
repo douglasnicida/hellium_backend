@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import { LoginRequestBody, RegisterRequestBody } from "./auth.route";
 import bcrypt from 'bcrypt';
 import { FastifyInstance } from "fastify";
+import { ConflictError } from "../../handlers/errorHandler";
 
 export class AuthService {
     constructor(private prisma: PrismaClient) {}
@@ -26,6 +27,11 @@ export class AuthService {
     }
 
     async register(data: RegisterRequestBody['Body']) {
+        const user = await this.prisma.user.findFirst({where: {email: data.email}});
+
+        if(user) {
+            throw ConflictError('This e-mail is already registered.');
+        }
 
         const newUserData = {
             ...data,
