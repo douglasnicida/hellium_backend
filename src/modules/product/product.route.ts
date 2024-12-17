@@ -20,6 +20,14 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
         }
     });
 
+    fastifyApp.get('/:id', async(req: FastifyRequest, res: FastifyReply) => {
+        try {
+            
+        } catch (err) {
+            
+        }
+    })
+
     done();
 }
 

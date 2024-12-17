@@ -1,5 +1,17 @@
 import { BaseReplySchema } from "../../types/fastify.type"
 
+export const UserSchema = {
+    type: 'object',
+    properties: {
+        id: { type: 'string' },
+        name: { type: 'string' },
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string' },
+        active: { type: 'boolean' }
+    },
+    required: ['id', 'name', 'email', 'password', 'active']
+};
+
 export const LoginRequestSchema = {
     type: 'object',
     required: ['email', 'password'],

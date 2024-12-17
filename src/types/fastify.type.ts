@@ -22,6 +22,6 @@ export const BaseReplySchema = {
 
 export interface CustomReply<T = unknown> {
     status?: HttpCodes;
-    message: string;
+    message?: string;
     payload?: T;
 }
