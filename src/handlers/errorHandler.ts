@@ -4,7 +4,7 @@ import { HttpCodes } from "../types/fastify.type";
 export class HttpError extends Error {
     statusCode: number;
 
-    constructor(message: string, statusCode: number) {
+    constructor(message: string, statusCode: HttpCodes) {
         super(message);
         this.statusCode = statusCode;
         this.name = this.constructor.name;
@@ -12,7 +12,7 @@ export class HttpError extends Error {
 }
 
 // Função para criar erros customizados
-function createHttpError(message: string, statusCode: number) {
+function createHttpError(message: string, statusCode: HttpCodes) {
     return new HttpError(message, statusCode);
 }
 

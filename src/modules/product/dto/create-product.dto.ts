@@ -1,6 +1,6 @@
 import { Recipe } from "@prisma/client";
 
-export interface CreateProductDTO {
+export class CreateProductDTO {
     name: string;
     price: number;
     stockQuantity: number;

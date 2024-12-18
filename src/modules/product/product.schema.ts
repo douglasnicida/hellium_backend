@@ -22,7 +22,8 @@ export const ProductSchema = {
   required: ['id', 'name', 'price', 'stockQuantity', 'active']
 };
   
-const CreateProductRequestSchema = {
+
+const CreateRequestSchema = {
   type: 'object',
   required: ['name', 'price', 'stockQuantity'],
   properties: {
@@ -32,8 +33,7 @@ const CreateProductRequestSchema = {
     Recipe: { type: 'object' }
   }
 }
-
-const CreateProductReplySchema = {
+const CreateReplySchema = {
   201: {
       ...BaseReplySchema,
       properties: {
@@ -42,13 +42,13 @@ const CreateProductReplySchema = {
       }
   }
 }
-
-export const CreateProductPostSchema = {
+export const CreatePostSchema = {
   schema: {
-      body: CreateProductRequestSchema,
-      response: CreateProductReplySchema
+      body: CreateRequestSchema,
+      response: CreateReplySchema
   }
 }
+
 
 const FindByIDRequestSchema = {
     type: 'object',
@@ -57,7 +57,6 @@ const FindByIDRequestSchema = {
         id: { type: 'string'}
     }
 }
-
 const FindByIDReplySchema = {
     200: {
         ...BaseReplySchema,
@@ -67,10 +66,42 @@ const FindByIDReplySchema = {
         }
     }
 }
-
 export const FindByIDGetSchema = {
     schema: {
         params: FindByIDRequestSchema,
         response: FindByIDReplySchema
     }
 }
+
+
+const UpdateBodyRequestSchema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    price: { type: 'number' },
+    stockQuantity: { type: 'integer' },
+    Recipe: { type: 'object' }
+  }
+}
+const UpdateParamsRequestSchema = {
+  type: 'object',
+  required: ['id'],
+  properties: {
+    id: { type: 'string' },
+  }
+}
+const UpdateReplySchema = {
+  200: {
+      ...BaseReplySchema,
+      properties: {
+          ...BaseReplySchema.properties,
+          payload: ProductSchema
+      }
+  }
+}
+export const UpdatePatchSchema = {
+      body: UpdateBodyRequestSchema,
+      params: UpdateParamsRequestSchema,
+      response: UpdateReplySchema
+}
+

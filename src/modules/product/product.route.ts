@@ -1,24 +1,37 @@
-import { Product } from "@prisma/client";
+import { Product, Recipe } from "@prisma/client";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { prisma } from "../../database/prisma-client";
 import { ProductService } from "./product.service";
 import handleAuthenticate from "../../middlewares/authMiddleware";
-import { CreateProductPostSchema, FindByIDGetSchema } from "./product.schema";
+import { CreatePostSchema, FindByIDGetSchema, UpdatePatchSchema } from "./product.schema";
 import { ObjectId } from "mongodb";
 import { objectIDValidation } from "../../middlewares/objectIdMiddleware";
-import { CreateProductDTO } from "./dto/createProductDTO";
-import { HttpError } from "../../handlers/errorHandler";
+import { CreateProductDTO } from "./dto/create-product.dto";
 import { CustomReply, HttpCodes } from "../../types/fastify.type";
+import { UpdateProductDTO } from "./dto/update-product.dto";
 
-export interface FindByIDRequestParam {
+export type FindByIDRequestParam = {
     Params: {
         id: ObjectId
-    }
+    };
+    Body: {}
 }
 
-export interface CreateProductRequest {
+export type CreateProductRequest = {
     Body: CreateProductDTO
 } 
+
+export type UpdateProductRequestParam = {
+    Params: {
+        id: ObjectId
+    };
+    Body: {
+        name?: string;
+        price?: number;
+        stockQuantity?: number;
+        Recipe?: Recipe;
+    };
+}
 
 const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
     const productService = new ProductService(prisma);
@@ -26,7 +39,7 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
     // Garantindo que o middleware de autenticação esteja em todas as rotas de produto
     fastifyApp.addHook('preHandler', handleAuthenticate)
 
-    fastifyApp.post('/', CreateProductPostSchema, async(req: FastifyRequest<CreateProductRequest>, res: FastifyReply) => {
+    fastifyApp.post('/', CreatePostSchema, async(req: FastifyRequest<CreateProductRequest>, res: FastifyReply) => {
         try {
             const resContent: CustomReply<Product> = await productService.create(req.body);
 
@@ -55,6 +68,17 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
             return res.status(err.statusCode).customSend({message: err.message});
         }
     });
+
+    // tentar entender o porque que precisar inferir assim no começo
+    fastifyApp.patch('/:id', {preValidation: objectIDValidation, schema: UpdatePatchSchema}, async(req: FastifyRequest<UpdateProductRequestParam>, res: FastifyReply) => {
+        try {
+            const resContent = await productService.update(req.params.id, req.body);
+
+            return res.status(HttpCodes.OK).customSend(resContent);
+        } catch(err) {
+            return res.status(err.statusCode).customSend({message: err.message});
+        }
+    })
 
     done();
 }

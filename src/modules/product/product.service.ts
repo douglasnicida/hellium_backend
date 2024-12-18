@@ -2,7 +2,8 @@ import { PrismaClient, Product } from "@prisma/client";
 import { CustomReply } from "../../types/fastify.type";
 import { ConflictError, NotFoundError } from "../../handlers/errorHandler";
 import { ObjectId } from "mongodb";
-import { CreateProductDTO } from "./dto/createProductDTO";
+import { CreateProductDTO } from "./dto/create-product.dto";
+import { UpdateProductDTO } from "./dto/update-product.dto";
 
 export class ProductService {
     constructor(private prisma: PrismaClient) {}
@@ -47,6 +48,34 @@ export class ProductService {
         const resContent: CustomReply<Product> = {
             payload: product,
         }
+
+        return resContent;
+    }
+
+    async update(id: ObjectId, updateDTO: UpdateProductDTO): Promise<CustomReply<Product>> {
+        const product = await this.prisma.product.findFirst({where: { id: id.toString() }});
+
+        if(!product) {
+            throw NotFoundError(`Product with ID ${id} not found.`);
+        }
+
+        if(updateDTO.name) {
+            const existentProduct = await this.prisma.product.findFirst({where: { name: updateDTO.name }});
+            
+            if(existentProduct && existentProduct.id !== product.id) {
+                throw ConflictError('Product name already exists.');
+            }
+        }
+
+        const updatedProduct = await this.prisma.product.update({
+            where: { id: product.id.toString() },
+            data: updateDTO
+        })
+
+        const resContent: CustomReply<Product> = {
+            message: `Product ${updatedProduct.name} updated successfully.`,
+            payload: updatedProduct
+        } 
 
         return resContent;
     }
