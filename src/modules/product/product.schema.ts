@@ -100,8 +100,10 @@ const UpdateReplySchema = {
   }
 }
 export const UpdatePatchSchema = {
-      body: UpdateBodyRequestSchema,
-      params: UpdateParamsRequestSchema,
-      response: UpdateReplySchema
+      schema: {
+        body: UpdateBodyRequestSchema,
+        params: UpdateParamsRequestSchema,
+        response: UpdateReplySchema
+      }
 }
 

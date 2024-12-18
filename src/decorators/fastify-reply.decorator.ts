@@ -11,11 +11,11 @@ export function customReplyDecorator(app: FastifyInstance) {
   app.decorateReply("customSend", function <T>
     (this: any, data: any | { message: string; status: HttpCodes }): CustomReply<T> {
     if (data.payload) {
-      if (Array.isArray(data.payload)) {
+      if (Array.isArray(data.payload.data)) {
         data.message =
-          data.payload.length == 0
+          data.payload.data.length == 0
             ? "No items were found."
-            : `${data.payload.length} items were found.`;
+            : `${data.payload.data.length} items were found.`;
       }
     }
 

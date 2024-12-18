@@ -4,6 +4,7 @@ import { ConflictError, NotFoundError } from "../../handlers/errorHandler";
 import { ObjectId } from "mongodb";
 import { CreateProductDTO } from "./dto/create-product.dto";
 import { UpdateProductDTO } from "./dto/update-product.dto";
+import { PaginatedResponse, PaginationParams } from "../../types/pagination.type";
 
 export class ProductService {
     constructor(private prisma: PrismaClient) {}
@@ -28,10 +29,27 @@ export class ProductService {
         return resContent;
     }
 
-    async findAll(): Promise<CustomReply<Product[]>> {
-        const products: Product[] = await this.prisma.product.findMany();
-        const resContent: CustomReply<Product[]> = {
-            payload: products,
+    async findAll(pagination: PaginationParams): Promise<CustomReply<PaginatedResponse<Product>>> {
+        const { page, size } = pagination;
+
+        const [products, total] = await Promise.all([
+            this.prisma.product.findMany({
+                skip: (page - 1) * size,
+                take: size,
+            }),
+            this.prisma.product.count()
+        ])
+
+        const resContent: CustomReply<PaginatedResponse<Product>> = {
+            payload: {
+                meta: {
+                    page: page,
+                    size: size,
+                    total: total,
+                    maxPage: Math.ceil(total / size)
+                },
+                data: products
+            },
         }
 
         return resContent;

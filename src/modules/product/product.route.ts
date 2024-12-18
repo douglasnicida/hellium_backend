@@ -9,6 +9,8 @@ import { objectIDValidation } from "../../middlewares/objectIdMiddleware";
 import { CreateProductDTO } from "./dto/create-product.dto";
 import { CustomReply, HttpCodes } from "../../types/fastify.type";
 import { UpdateProductDTO } from "./dto/update-product.dto";
+import { handlePagination, PaginationRequest } from "../../middlewares/paginationMiddleware";
+import { PaginationGetSchema } from "../../types/pagination.type";
 
 export type FindByIDRequestParam = {
     Params: {
@@ -50,11 +52,11 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
     })
 
     // TODO: fazer paginação
-    fastifyApp.get('/', async(req: FastifyRequest, res: FastifyReply) => {
+    fastifyApp.get('/', {preHandler: handlePagination, schema: PaginationGetSchema.schema}, async(req: FastifyRequest<PaginationRequest>, res: FastifyReply) => {
         try {
-            const resContent = await productService.findAll();
+            const resContent = await productService.findAll(req.pagination);
 
-            return res.status(HttpCodes.OK).customSend<Product[]>(resContent);
+            return res.status(HttpCodes.OK).customSend(resContent);
         } catch(err) {
             res.status(err.statusCode).customSend({ message: 'Error to find products.' });
         }
@@ -70,7 +72,7 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
     });
 
     // tentar entender o porque que precisar inferir assim no começo
-    fastifyApp.patch('/:id', {preValidation: objectIDValidation, schema: UpdatePatchSchema}, async(req: FastifyRequest<UpdateProductRequestParam>, res: FastifyReply) => {
+    fastifyApp.patch('/:id', {preValidation: objectIDValidation, schema: UpdatePatchSchema.schema}, async(req: FastifyRequest<UpdateProductRequestParam>, res: FastifyReply) => {
         try {
             const resContent = await productService.update(req.params.id, req.body);
 
