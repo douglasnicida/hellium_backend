@@ -56,7 +56,7 @@ customReplyDecorator(app);
 const start = async () => {
     try {
         await app.listen({ port: Number(process.env.PORT) })
-        console.info(`Server listening on port ${Number(process.env.PORT)}`);
+        console.warn(`Server listening on port ${Number(process.env.PORT)}`);
     } catch(err) {
         console.error(err)
         process.exit(1)

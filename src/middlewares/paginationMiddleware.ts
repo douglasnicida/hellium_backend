@@ -20,12 +20,12 @@ export interface PaginationRequest {
 }
 
 export const handlePagination = async(req: FastifyRequest<PaginationRequest>, res: FastifyReply): Promise<any> => {
-    const { page=1, size=10 } = req.query;
+    const { page=1, size=15 } = req.query;
 
     if(page<1 || size<1) { throw BadRequestError('Page and size must be greater than 0') }
 
     req.pagination = {
-        page: Math.floor(page),
+        page: Math.floor(page) - 1,
         size: Math.floor(size),
         skip: (page-1) * size,
     }

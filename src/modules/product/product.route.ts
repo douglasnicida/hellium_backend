@@ -16,7 +16,6 @@ export type FindByIDRequestParam = {
     Params: {
         id: ObjectId
     };
-    Body: {}
 }
 
 export type CreateProductRequest = {
@@ -41,9 +40,10 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
     // Garantindo que o middleware de autenticação esteja em todas as rotas de produto
     fastifyApp.addHook('preHandler', handleAuthenticate)
 
-    fastifyApp.post('/', CreatePostSchema, async(req: FastifyRequest<CreateProductRequest>, res: FastifyReply) => {
+    fastifyApp.post('/', CreatePostSchema, async(req: FastifyRequest, res: FastifyReply) => {
         try {
-            const resContent: CustomReply<Product> = await productService.create(req.body);
+            const body = req.body as CreateProductRequest['Body'];
+            const resContent = await productService.create(body);
 
             return res.status(HttpCodes.CREATED).customSend(resContent);
         } catch (err) {
@@ -51,8 +51,7 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
         }
     })
 
-    // TODO: fazer paginação
-    fastifyApp.get('/', {preHandler: handlePagination, schema: PaginationGetSchema.schema}, async(req: FastifyRequest<PaginationRequest>, res: FastifyReply) => {
+    fastifyApp.get('/', {preHandler: handlePagination, schema: PaginationGetSchema.schema}, async(req: FastifyRequest, res: FastifyReply) => {
         try {
             const resContent = await productService.findAll(req.pagination);
 
@@ -62,19 +61,23 @@ const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {
         }
     });
 
-    fastifyApp.get('/:id', {preValidation: objectIDValidation, schema: FindByIDGetSchema.schema}, async(req: FastifyRequest<FindByIDRequestParam>, res: FastifyReply) => {
+    fastifyApp.get('/:id', {preValidation: objectIDValidation, schema: FindByIDGetSchema.schema}, async(req: FastifyRequest, res: FastifyReply) => {
         try {
-            const resContent = await productService.findByID(req.params.id);
-            return res.status(HttpCodes.OK).customSend<Product>(resContent);
+            const { id } = req.params as FindByIDRequestParam['Params'];
+            const resContent = await productService.findByID(id);
+
+            return res.status(HttpCodes.OK).customSend(resContent);
         } catch (err) {
             return res.status(err.statusCode).customSend({message: err.message});
         }
     });
 
-    // tentar entender o porque que precisar inferir assim no começo
-    fastifyApp.patch('/:id', {preValidation: objectIDValidation, schema: UpdatePatchSchema.schema}, async(req: FastifyRequest<UpdateProductRequestParam>, res: FastifyReply) => {
+    fastifyApp.patch('/:id', {preValidation: objectIDValidation, schema: UpdatePatchSchema.schema}, async(req: FastifyRequest, res: FastifyReply) => {
         try {
-            const resContent = await productService.update(req.params.id, req.body);
+            const { id } = req.params as UpdateProductRequestParam['Params'];
+            const body = req.body as UpdateProductRequestParam['Body'];
+
+            const resContent = await productService.update(id, body);
 
             return res.status(HttpCodes.OK).customSend(resContent);
         } catch(err) {

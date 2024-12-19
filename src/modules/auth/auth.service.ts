@@ -1,6 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
 import jwt from 'jsonwebtoken'
-import { LoginRequestBody, RegisterRequestBody } from "./auth.route";
 import bcrypt from 'bcrypt';
 import { FastifyInstance } from "fastify";
 import { ConflictError, UnauthorizedError } from "../../handlers/errorHandler";

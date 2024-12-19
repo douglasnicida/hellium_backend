@@ -18,9 +18,10 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
     const authService = new AuthService(prisma);
 
     fastifyApp.post('/register', RegisterPostSchema, 
-    async (req: FastifyRequest<RegisterRequestBody>, res: FastifyReply) => {
+    async (req: FastifyRequest, res: FastifyReply) => {
         try {
-            const resContent = await authService.register(req.body);
+            const body = req.body as RegisterRequestBody['Body'];
+            const resContent = await authService.register(body);
 
             return res.status(HttpCodes.CREATED).customSend(resContent);
         } catch (err) {
@@ -29,9 +30,10 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
     })
 
     fastifyApp.post('/login', LoginPostSchema,
-    async (req: FastifyRequest<LoginRequestBody>, res: FastifyReply) => {
+    async (req: FastifyRequest, res: FastifyReply) => {
         try {
-            const resContent = await authService.login(req.body, fastifyApp);
+            const body = req.body as LoginRequestBody['Body'];
+            const resContent = await authService.login(body, fastifyApp);
         
             return res.status(HttpCodes.OK).customSend(resContent)
         } catch (err) {
