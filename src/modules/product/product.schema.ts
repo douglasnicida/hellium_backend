@@ -8,6 +8,7 @@ export const ProductSchema = {
     name: { type: 'string' },
     price: { type: 'number' },
     stockQuantity: { type: 'integer' },
+    img: { type: 'string' },
     active: { type: 'boolean' },
     items: {
       type: 'array',
@@ -30,6 +31,7 @@ const CreateRequestSchema = {
     name: { type: 'string' },
     price: { type: 'number' },
     stockQuantity: { type: 'integer' },
+    img: { type: 'string' },
     Recipe: { type: 'object' }
   }
 }
@@ -80,6 +82,7 @@ const UpdateBodyRequestSchema = {
     name: { type: 'string' },
     price: { type: 'number' },
     stockQuantity: { type: 'integer' },
+    img: { type: 'string' },
     Recipe: { type: 'object' }
   }
 }

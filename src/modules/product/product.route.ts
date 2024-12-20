@@ -26,12 +26,7 @@ export type UpdateProductRequestParam = {
     Params: {
         id: ObjectId
     };
-    Body: {
-        name?: string;
-        price?: number;
-        stockQuantity?: number;
-        Recipe?: Recipe;
-    };
+    Body: UpdateProductDTO;
 }
 
 const productsRoute = (fastifyApp: FastifyInstance, opts, done) => {

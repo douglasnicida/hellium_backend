@@ -29,6 +29,7 @@ model Product {
   name          String
   price         Float
   stockQuantity Int
+  img           String
   active        Boolean @default(true)
 
   items  Item[]
