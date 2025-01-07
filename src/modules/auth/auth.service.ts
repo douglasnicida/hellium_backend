@@ -41,12 +41,7 @@ export class AuthService {
 
         const newUser = await this.prisma.user.create({ data: newUserData });
 
-        const resContent: CustomReply<User> = {
-            message: 'User created successfully',
-            payload: newUser,
-        }
-
-        return resContent;
+        return newUser;
     }
 
     async login(credentialsDTO: LoginDTO, fastifyApp: FastifyInstance) {
@@ -59,14 +54,9 @@ export class AuthService {
         const isValidPassword = await bcrypt.compare(credentialsDTO.password, user.password);
 
         if(user && isValidPassword){
-            const resContent: CustomReply<any> = {
-                message: 'User logged in successfully.',
-                payload: {
-                    access_token: await this.generateToken(user.id, user.name, fastifyApp)
-                }
-            } 
-            
-            return resContent;
+            return {
+                access_token: await this.generateToken(user.id, user.name, fastifyApp)
+            };
         }
 
         throw UnauthorizedError('Invalid credentials');

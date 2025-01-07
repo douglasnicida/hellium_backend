@@ -10,7 +10,7 @@ export class ProductService {
     constructor(private prisma: PrismaClient) {}
 
     // fazer os service de criação de produto e passar a usar dto
-    async create(createDTO: CreateProductDTO): Promise<CustomReply<Product>> {
+    async create(createDTO: CreateProductDTO): Promise<Product> {
         const product = await this.prisma.product.findFirst({where: {name: createDTO.name}});
 
         if(product) {
@@ -20,16 +20,12 @@ export class ProductService {
         const newProduct = await this.prisma.product.create({
             data: createDTO
         })
-
-        const resContent: CustomReply<Product> = {
-            message: `Product ${newProduct.name} created successfully.`,
-            payload: newProduct
-        }
         
-        return resContent;
+        
+        return newProduct;
     }
 
-    async findAll(pagination: PaginationParams): Promise<CustomReply<PaginatedResponse<Product>>> {
+    async findAll(pagination: PaginationParams): Promise<PaginatedResponse<Product>> {
         const { page, size } = pagination;
 
         const [products, total] = await Promise.all([
@@ -40,22 +36,20 @@ export class ProductService {
             this.prisma.product.count()
         ])
 
-        const resContent: CustomReply<PaginatedResponse<Product>> = {
-            payload: {
-                meta: {
-                    page: page,
-                    size: size,
-                    total: total,
-                    maxPage: Math.ceil(total / size)
-                },
-                data: products
+        const paginatedContent: PaginatedResponse<Product> = {    
+            meta: {
+                page: page,
+                size: size,
+                total: total,
+                maxPage: Math.ceil(total / size)
             },
+            data: products
         }
 
-        return resContent;
+        return paginatedContent;
     }
 
-    async findByID(id: ObjectId): Promise<CustomReply<Product>> {
+    async findByID(id: ObjectId): Promise<Product> {
 
         const product = await this.prisma.product.findFirst({ where: { id: id.toString() } });
 
@@ -63,14 +57,10 @@ export class ProductService {
             throw NotFoundError('No product found.');
         }
 
-        const resContent: CustomReply<Product> = {
-            payload: product,
-        }
-
-        return resContent;
+        return product;
     }
 
-    async update(id: ObjectId, updateDTO: UpdateProductDTO): Promise<CustomReply<Product>> {
+    async update(id: ObjectId, updateDTO: UpdateProductDTO): Promise<Product> {
         const product = await this.prisma.product.findFirst({where: { id: id.toString() }});
 
         if(!product) {
@@ -90,11 +80,6 @@ export class ProductService {
             data: updateDTO
         })
 
-        const resContent: CustomReply<Product> = {
-            message: `Product ${updatedProduct.name} updated successfully.`,
-            payload: updatedProduct
-        } 
-
-        return resContent;
+        return updatedProduct;
     }
 }

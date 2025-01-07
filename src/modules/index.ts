@@ -8,11 +8,13 @@ import { IngredientSchema } from "./ingredient/ingredient.schema";
 import { RecipeSchema } from "./recipe/recipe.schema";
 import { ItemSchema } from "./item/item.schema";
 import { SaleSchema } from "./sale/sale.schema";
+import { itemsRoute } from "./item/item.route";
 
 // Routes
 export const registerRoutes: FastifyPluginCallback = (fastifyApp: FastifyInstance, opts, done) => {
     fastifyApp.register(authRoute, {prefix: '/auth'});
     fastifyApp.register(productsRoute, {prefix: '/products'});
+    fastifyApp.register(itemsRoute, {prefix: '/items'});
     
     done();
 }

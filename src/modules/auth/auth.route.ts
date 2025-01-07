@@ -2,9 +2,10 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { LoginPostSchema, RegisterPostSchema } from "./auth.schema";
 import { AuthService } from "./auth.service";
 import { prisma } from "../../database/prisma-client";
-import { HttpCodes } from "../../types/fastify.type";
+import { CustomReply, HttpCodes } from "../../types/fastify.type";
 import { LoginDTO } from "./dto/loginDTO";
 import { RegisterDTO } from "./dto/registerDTO";
+import { User } from "@prisma/client";
 
 export interface LoginRequestBody {
     Body: LoginDTO
@@ -21,7 +22,12 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
     async (req: FastifyRequest, res: FastifyReply) => {
         try {
             const body = req.body as RegisterRequestBody['Body'];
-            const resContent = await authService.register(body);
+            const newUser = await authService.register(body);
+
+            const resContent: CustomReply<User> = {
+                message: 'User created successfully',
+                payload: newUser,
+            }
 
             return res.status(HttpCodes.CREATED).customSend(resContent);
         } catch (err) {
@@ -33,9 +39,14 @@ const authRoute = (fastifyApp: FastifyInstance, opts, done) => {
     async (req: FastifyRequest, res: FastifyReply) => {
         try {
             const body = req.body as LoginRequestBody['Body'];
-            const resContent = await authService.login(body, fastifyApp);
+            const access_token_obj = await authService.login(body, fastifyApp);
+
+            const resContent: CustomReply<{access_token: string}> = {
+                message: 'User logged in successfully.',
+                payload: access_token_obj
+            } 
         
-            return res.status(HttpCodes.OK).customSend(resContent)
+            return res.status(HttpCodes.OK).customSend(resContent);
         } catch (err) {
             return res.status(err.statusCode).customSend({message: err.message});
         }

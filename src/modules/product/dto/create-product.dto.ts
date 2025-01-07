@@ -6,4 +6,5 @@ export class CreateProductDTO {
     stockQuantity: number;
     img?: string;
     Recipe?: Recipe;
+    active?: boolean;
 }

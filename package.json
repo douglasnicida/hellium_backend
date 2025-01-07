@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --watch src src/server.ts",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -27,8 +28,10 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   }
 }

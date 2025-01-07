@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export const HttpCodes = {
     OK: 200,
     CREATED: 201,
@@ -25,4 +27,10 @@ export interface CustomReply<T = unknown> {
     status?: HttpCodes;
     message?: string;
     payload?: T;
+}
+
+export type FindByIDRequestParam = {
+    Params: {
+        id: ObjectId
+    };
 }
